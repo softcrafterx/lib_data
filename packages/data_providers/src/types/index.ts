@@ -1,11 +1,30 @@
-export interface IDataProvider<Response = any, DTO = any>{
-  getOne?(): Promise<Response>;
-  getList?(): Promise<Response[]>;
-  getMany?(): Promise<Response[]>;
-  createOne?(payload: DTO): Promise<Partial<Response> | void>;
-  createMany?(): Promise<Partial<Response>[] | void>;
-  deleteOne?(): Promise<Response | void>;
-  deleteMany?(): Promise<Response[] | void>;
-  updateOne?(payload: Partial<DTO>): Promise<Response |void>;
-  updateMany?(): Promise<Response[] |void>;
+export type Meta = Record<string, unknown>
+
+export interface IDataProvider<ResponseDTO = any, SaveDTO = ResponseDTO>{
+  getOne?(params:IGetOneParams, meta?: Meta ): Promise<ResponseDTO>;
+  getList?(params: IGetListParams, meta?: Meta): Promise<ResponseDTO[]>;
+  getMany?(ids: (string | number)[], meta?: Meta): Promise<ResponseDTO[]>;
+  createOne?(payload: SaveDTO, meta?: Meta): Promise<Partial<ResponseDTO> | void>;
+  createMany?(payload: SaveDTO[], meta?: Meta): Promise<Partial<ResponseDTO>[] | void>;
+  deleteOne?(id: string | number, meta?: Meta): Promise<ResponseDTO | void>;
+  deleteMany?(ids: (string | number)[], meta?: Meta): Promise<ResponseDTO[] | void>;
+  updateOne?(payload: Partial<SaveDTO>, meta?: Meta): Promise<ResponseDTO |void>;
+  updateMany?(payload: Partial<SaveDTO>[], meta?: Meta): Promise<ResponseDTO[] |void>;
+}
+
+export interface IGetOneParams<FilterDTO = any>{
+  id?: string | number;
+  filter?: FilterDTO
+}
+
+
+export interface PaginationParams{
+  page?: number;
+  limit?: number;
+}
+
+export interface IGetListParams<T = any, FilterDTO = T>{
+  pagination?: PaginationParams;
+  sort?: Record<keyof T, 'desc' | 'asc'>;
+  filter?: FilterDTO;
 }
