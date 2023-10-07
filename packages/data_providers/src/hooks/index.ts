@@ -138,18 +138,24 @@ export function useCreateOne<T = any, DTO = T>(resource: string, options?: {payl
   }
 }
 
-export function useCreateMany<T = any>(resource: string){
+export function useCreateMany<T = any, SaveDTO = T>(resource: string, options?: {payload?: Partial<SaveDTO>[]; meta: Meta}){
   const provider = useGetProvider(resource)
 
-  return async (): Promise<Partial<T>[] | void> =>{
+  return async (innerPayload?: Partial<SaveDTO>[], meta?: Meta): Promise<Partial<T>[] | void> =>{
     if(!provider.createMany)
      throw new NotImplementError('createMany', resource)
 
-    return await provider.createMany()
+    return await provider.createMany([
+      ...(options?.payload ?? []),
+      ...(innerPayload ?? [])
+    ], {
+      ...options?.meta,
+      ...meta
+    })
   }
 }
 
-export function useUpdateOne<T = any, DTO = any>(resource: string, payload?: Partial<DTO>){
+export function useUpdateOne<T = any, DTO = any>(resource: string, options?: {payload?: Partial<DTO>; meta: Meta}){
   const provider = useGetProvider(resource)
 
   return async (innerPayload: Partial<DTO>): Promise<Partial<T> | void> => {
@@ -157,44 +163,60 @@ export function useUpdateOne<T = any, DTO = any>(resource: string, payload?: Par
       throw new NotImplementError('updateOne', resource)
 
     return await provider.updateOne({
-      ...payload,
+      ...options?.payload,
       ...innerPayload
     })
   }
 }
 
 
-export function useUpdateMany<T = any>(resource: string){
+export function useUpdateMany<T = any, DTO =T>(resource: string, options?: {payload?: Partial<DTO>[]; meta: Meta}){
   const provider = useGetProvider(resource)
 
-  return async (): Promise<Partial<T>[] | void> =>{
+  return async (payload?: Partial<DTO>[], meta?: Meta): Promise<Partial<T>[] | void> =>{
     if(!provider.updateMany)
       throw new NotImplementError('updateMany', resource)
   
-    return await provider.updateMany()
+    return await provider.updateMany([
+      ...(options?.payload ?? []),
+      ...(payload ?? [])
+    ], {
+      ...options?.meta,
+      ...meta
+    })
   }
 }
 
-export function useDeleteOne<T = any>(resource: string){
+export function useDeleteOne<T = any>(resource: string, options?:{ payload?: string | number, meta?: Meta}){
   const provider = useGetProvider(resource)
 
-  return async (): Promise<Partial<T> | void> => {
+  return async (payload?: string | number, meta? : Meta): Promise<Partial<T> | void> => {
     if(!provider.deleteOne)
       throw new NotImplementError('deleteOne', resource)
+    const data = options?.payload ?? payload
 
-    return await provider.deleteOne()
+    if(!data && data !==0)
+      throw new Error('id not provided')
+
+    return await provider.deleteOne(data, {...options?.meta, ...meta})
   }
 }
 
 
-export function useDeleteMany<T = any>(resource: string){
+export function useDeleteMany<T = any>(resource: string, options?: { ids?: (string | number)[] , meta?: Meta}){
   const provider = useGetProvider(resource)
 
-  return async (): Promise<Partial<T>[] | void> => {
+  return async (ids?: (string | number)[], meta?: Meta): Promise<Partial<T>[] | void> => {
     if(!provider.deleteMany)
       throw new NotImplementError('deleteMany', resource)
 
-    return await provider.deleteMany()
+    return await provider.deleteMany([
+      ...(options?.ids  ?? []),
+      ...(ids ?? [])
+    ], {
+      ...options?.meta,
+      ...meta
+    })
   }
 }
 
