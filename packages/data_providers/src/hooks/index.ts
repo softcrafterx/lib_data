@@ -1,61 +1,71 @@
-import { useContext, useMemo } from "react";
-import { dataContext } from "../context";
-import { IDataProvider, IGetListParams, IGetOneParams, Meta } from "../types";
+import { useContext, useMemo } from 'react';
+import { dataContext } from '../context';
+import { IDataProvider, IGetListParams, IGetOneParams, Meta } from '../types';
 
-class NotImplementError extends Error{
-  constructor(methodName: string, resource = ''){
-    super(`${methodName} method not implemented in resource ${resource}`)
+class NotImplementError extends Error {
+  constructor(methodName: string, resource = '') {
+    super(`${methodName} method not implemented in resource ${resource}`);
   }
 }
 
-export function useGetProvider<T extends IDataProvider = IDataProvider>(resource: string){
-  const context = useContext(dataContext)
+export function useGetProvider<T extends IDataProvider = IDataProvider>(
+  resource: string
+) {
+  const context = useContext(dataContext);
 
-  if(!context)
-    throw new Error('No data providers created or context not provided')
+  if (!context)
+    throw new Error('No data providers created or context not provided');
 
-  const provider = useMemo(
-    ()=>context[resource], [resource]
-  )
+  const provider = useMemo(() => context[resource], [resource]);
 
-  if(!provider)
-    throw new Error(`Provider with ${resource} name does not exist`)
+  if (!provider)
+    throw new Error(`Provider with ${resource} name does not exist`);
 
-  return provider as T
+  return provider as T;
 }
 
-export function useGetOne<T = any >(resource: string, options?: {payload?: IGetOneParams, meta?: Meta}){
-  const provider = useGetProvider(resource)
+export function useGetOne<T = any>(
+  resource: string,
+  options?: { payload?: IGetOneParams; meta?: Meta }
+) {
+  const provider = useGetProvider(resource);
 
   return async (innerPayload?: IGetOneParams, meta?: Meta): Promise<T> => {
-    if(!provider.getOne)
-      throw new NotImplementError('getOne', resource)
+    if (!provider.getOne) throw new NotImplementError('getOne', resource);
 
-    return await provider.getOne({
-      ...options?.payload,
-      ...innerPayload
-    },{
-      ...options?.meta,
-      ...meta
-    })
-  }
+    return await provider.getOne(
+      {
+        ...options?.payload,
+        ...innerPayload,
+      },
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
 }
 
-export function useGetList<T = any>(resource: string, options?: {payload?: IGetListParams;  meta?: Meta}){
-  const provider = useGetProvider(resource)
+export function useGetList<T = any>(
+  resource: string,
+  options?: { payload?: IGetListParams; meta?: Meta }
+) {
+  const provider = useGetProvider(resource);
 
   return async (innerPayload?: IGetListParams, meta?: Meta): Promise<T[]> => {
-    if(!provider.getList)
-      throw new NotImplementError('getList', resource)
+    if (!provider.getList) throw new NotImplementError('getList', resource);
 
-    return await provider.getList({
-      ...options?.payload,
-      ...innerPayload
-    }, {
-      ...options?.meta,
-      ...meta
-    })
-  }
+    return await provider.getList(
+      {
+        ...options?.payload,
+        ...innerPayload,
+      },
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
 }
 
 /**
@@ -121,102 +131,140 @@ const AskForReportPremium = ()=>{
 
  */
 
-export function useCreateOne<T = any, DTO = T>(resource: string, options?: {payload?: Partial<DTO>; meta?: Meta}){
-  const provider = useGetProvider(resource)
+export function useCreateOne<T = any, DTO = T>(
+  resource: string,
+  options?: { payload?: Partial<DTO>; meta?: Meta }
+) {
+  const provider = useGetProvider(resource);
 
-  return async (innerPayload?: Partial<DTO>, meta?: Meta): Promise<Partial<T> | void> =>{
-    if(!provider.createOne)
-     throw new NotImplementError('createOne', resource)
+  return async (
+    innerPayload?: Partial<DTO>,
+    meta?: Meta
+  ): Promise<Partial<T> | void> => {
+    if (!provider.createOne) throw new NotImplementError('createOne', resource);
 
-    return await provider.createOne({
-      ...options?.payload,
-      ...innerPayload
-    }, {
-      ...options?.meta,
-      ...meta
-    })
-  }
+    return await provider.createOne(
+      {
+        ...options?.payload,
+        ...innerPayload,
+      },
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
 }
 
-export function useCreateMany<T = any, SaveDTO = T>(resource: string, options?: {payload?: Partial<SaveDTO>[]; meta: Meta}){
-  const provider = useGetProvider(resource)
+export function useCreateMany<T = any, SaveDTO = T>(
+  resource: string,
+  options?: { payload?: Partial<SaveDTO>[]; meta: Meta }
+) {
+  const provider = useGetProvider(resource);
 
-  return async (innerPayload?: Partial<SaveDTO>[], meta?: Meta): Promise<Partial<T>[] | void> =>{
-    if(!provider.createMany)
-     throw new NotImplementError('createMany', resource)
+  return async (
+    innerPayload?: Partial<SaveDTO>[],
+    meta?: Meta
+  ): Promise<Partial<T>[] | void> => {
+    if (!provider.createMany)
+      throw new NotImplementError('createMany', resource);
 
-    return await provider.createMany([
-      ...(options?.payload ?? []),
-      ...(innerPayload ?? [])
-    ], {
-      ...options?.meta,
-      ...meta
-    })
-  }
+    return await provider.createMany(
+      [...(options?.payload ?? []), ...(innerPayload ?? [])],
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
 }
 
-export function useUpdateOne<T = any, DTO = any>(resource: string, options?: {payload?: Partial<DTO>; meta: Meta}){
-  const provider = useGetProvider(resource)
+export function useUpdateOne<T = any, DTO = any>(
+  resource: string,
+  options?: { payload?: Partial<DTO>; meta: Meta }
+) {
+  const provider = useGetProvider(resource);
 
-  return async (innerPayload: Partial<DTO>): Promise<Partial<T> | void> => {
-    if(!provider.updateOne)
-      throw new NotImplementError('updateOne', resource)
+  return async (
+    innerPayload: Partial<DTO>,
+    meta?: Meta
+  ): Promise<Partial<T> | void> => {
+    if (!provider.updateOne) throw new NotImplementError('updateOne', resource);
 
-    return await provider.updateOne({
-      ...options?.payload,
-      ...innerPayload
-    })
-  }
+    return await provider.updateOne(
+      {
+        ...options?.payload,
+        ...innerPayload,
+      },
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
 }
 
+export function useUpdateMany<T = any, DTO = T>(
+  resource: string,
+  options?: { payload?: Partial<DTO>[]; meta: Meta }
+) {
+  const provider = useGetProvider(resource);
 
-export function useUpdateMany<T = any, DTO =T>(resource: string, options?: {payload?: Partial<DTO>[]; meta: Meta}){
-  const provider = useGetProvider(resource)
+  return async (
+    payload?: Partial<DTO>[],
+    meta?: Meta
+  ): Promise<Partial<T>[] | void> => {
+    if (!provider.updateMany)
+      throw new NotImplementError('updateMany', resource);
 
-  return async (payload?: Partial<DTO>[], meta?: Meta): Promise<Partial<T>[] | void> =>{
-    if(!provider.updateMany)
-      throw new NotImplementError('updateMany', resource)
-  
-    return await provider.updateMany([
-      ...(options?.payload ?? []),
-      ...(payload ?? [])
-    ], {
-      ...options?.meta,
-      ...meta
-    })
-  }
+    return await provider.updateMany(
+      [...(options?.payload ?? []), ...(payload ?? [])],
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
 }
 
-export function useDeleteOne<T = any>(resource: string, options?:{ payload?: string | number, meta?: Meta}){
-  const provider = useGetProvider(resource)
+export function useDeleteOne<T = any>(
+  resource: string,
+  options?: { payload?: string | number; meta?: Meta }
+) {
+  const provider = useGetProvider(resource);
 
-  return async (payload?: string | number, meta? : Meta): Promise<Partial<T> | void> => {
-    if(!provider.deleteOne)
-      throw new NotImplementError('deleteOne', resource)
-    const data = options?.payload ?? payload
+  return async (
+    payload?: string | number,
+    meta?: Meta
+  ): Promise<Partial<T> | void> => {
+    if (!provider.deleteOne) throw new NotImplementError('deleteOne', resource);
+    const data = options?.payload ?? payload;
 
-    if(!data && data !==0)
-      throw new Error('id not provided')
+    if (!data && data !== 0) throw new Error('id not provided');
 
-    return await provider.deleteOne(data, {...options?.meta, ...meta})
-  }
+    return await provider.deleteOne(data, { ...options?.meta, ...meta });
+  };
 }
 
+export function useDeleteMany<T = any>(
+  resource: string,
+  options?: { ids?: (string | number)[]; meta?: Meta }
+) {
+  const provider = useGetProvider(resource);
 
-export function useDeleteMany<T = any>(resource: string, options?: { ids?: (string | number)[] , meta?: Meta}){
-  const provider = useGetProvider(resource)
+  return async (
+    ids?: (string | number)[],
+    meta?: Meta
+  ): Promise<Partial<T>[] | void> => {
+    if (!provider.deleteMany)
+      throw new NotImplementError('deleteMany', resource);
 
-  return async (ids?: (string | number)[], meta?: Meta): Promise<Partial<T>[] | void> => {
-    if(!provider.deleteMany)
-      throw new NotImplementError('deleteMany', resource)
-
-    return await provider.deleteMany([
-      ...(options?.ids  ?? []),
-      ...(ids ?? [])
-    ], {
-      ...options?.meta,
-      ...meta
-    })
-  }
+    return await provider.deleteMany(
+      [...(options?.ids ?? []), ...(ids ?? [])],
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
 }
-
