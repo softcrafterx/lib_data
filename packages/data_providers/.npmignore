@@ -1,0 +1,4 @@
+src/
+vitest*
+env*
+node_modules/
