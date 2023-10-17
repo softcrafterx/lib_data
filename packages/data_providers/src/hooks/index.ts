@@ -158,7 +158,7 @@ export function useCreateOne<T = any, DTO = T>(
 
 export function useCreateMany<T = any, SaveDTO = T>(
   resource: string,
-  options?: { payload?: Partial<SaveDTO>[]; meta: Meta }
+  options?: { payload?: Partial<SaveDTO>[]; meta?: Meta }
 ) {
   const provider = useGetProvider(resource);
 
@@ -181,7 +181,7 @@ export function useCreateMany<T = any, SaveDTO = T>(
 
 export function useUpdateOne<T = any, DTO = any>(
   resource: string,
-  options?: { payload?: Partial<DTO>; meta: Meta }
+  options?: { payload?: Partial<DTO>; meta?: Meta }
 ) {
   const provider = useGetProvider(resource);
 
@@ -206,7 +206,7 @@ export function useUpdateOne<T = any, DTO = any>(
 
 export function useUpdateMany<T = any, DTO = T>(
   resource: string,
-  options?: { payload?: Partial<DTO>[]; meta: Meta }
+  options?: { payload?: Partial<DTO>[]; meta?: Meta }
 ) {
   const provider = useGetProvider(resource);
 
