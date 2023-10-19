@@ -7,10 +7,20 @@ export {
   useGetOne, 
   useGetProvider,
   useUpdateMany,
-  useUpdateOne
+  useUpdateOne,
+  useSyncCreateMany,
+  useSyncCreateOne,
+  useSyncDeleteMany,
+  useSyncDeleteOne,
+  useSyncGetOne,
+  useSyncGetProvider,
+  useSyncUpdateMany,
+  useSyncUpdateOne
 } from './hooks'
 
 
 export { default as DataProvider } from './provider'
 
-export { IDataProvider, IGetListParams, IGetOneParams, Meta, PaginationParams } from './types'
+export { default as DataSyncProvider } from './syncProvider'
+
+export { IDataProvider, IGetListParams, IGetOneParams, Meta, PaginationParams , IDataSyncProvider} from './types'

@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react';
-import { dataContext } from '../context';
-import { IDataProvider, IGetListParams, IGetOneParams, Meta } from '../types';
+import { dataContext, dataSyncContext } from '../context';
+import { IDataProvider, IDataSyncProvider, IGetListParams, IGetOneParams, Meta } from '../types';
 
 class NotImplementError extends Error {
   constructor(methodName: string, resource = '') {
@@ -24,6 +24,22 @@ export function useGetProvider<T extends IDataProvider = IDataProvider>(
   return provider as T;
 }
 
+export function useSyncGetProvider<T extends IDataSyncProvider = IDataSyncProvider>(
+  resource: string
+) {
+  const context = useContext(dataSyncContext);
+
+  if (!context)
+    throw new Error('No data providers created or context not provided');
+
+  const provider = useMemo(() => context[resource], [resource]);
+
+  if (!provider)
+    throw new Error(`Provider with ${resource} name does not exist`);
+
+  return provider as T;
+}
+
 export function useGetOne<T = any>(
   resource: string,
   options?: { payload?: IGetOneParams; meta?: Meta }
@@ -34,6 +50,28 @@ export function useGetOne<T = any>(
     if (!provider.getOne) throw new NotImplementError('getOne', resource);
 
     return await provider.getOne(
+      {
+        ...options?.payload,
+        ...innerPayload,
+      },
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
+}
+
+export function useSyncGetOne<T = any>(
+  resource: string,
+  options?: { payload?: IGetOneParams; meta?: Meta }
+) {
+  const provider = useSyncGetProvider(resource);
+
+  return (innerPayload?: IGetOneParams, meta?: Meta) => {
+    if (!provider.getOne) throw new NotImplementError('getOne', resource);
+
+    return provider.getOne(
       {
         ...options?.payload,
         ...innerPayload,
@@ -156,6 +194,32 @@ export function useCreateOne<T = any, DTO = T>(
   };
 }
 
+export function useSyncCreateOne<T = any, DTO = T>(
+  resource: string,
+  options?: { payload?: Partial<DTO>; meta?: Meta }
+) {
+  const provider = useSyncGetProvider(resource);
+
+  return (
+    innerPayload?: Partial<DTO>,
+    meta?: Meta
+  ): Partial<T> | void => {
+    if (!provider.createOne) throw new NotImplementError('createOne', resource);
+
+    return provider.createOne(
+      {
+        ...options?.payload,
+        ...innerPayload,
+      },
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
+}
+
+
 export function useCreateMany<T = any, SaveDTO = T>(
   resource: string,
   options?: { payload?: Partial<SaveDTO>[]; meta?: Meta }
@@ -179,6 +243,29 @@ export function useCreateMany<T = any, SaveDTO = T>(
   };
 }
 
+export function useSyncCreateMany<T = any, SaveDTO = T>(
+  resource: string,
+  options?: { payload?: Partial<SaveDTO>[]; meta?: Meta }
+) {
+  const provider = useSyncGetProvider(resource);
+
+  return (
+    innerPayload?: Partial<SaveDTO>[],
+    meta?: Meta
+  ): Partial<T>[] | void => {
+    if (!provider.createMany)
+      throw new NotImplementError('createMany', resource);
+
+    return provider.createMany(
+      [...(options?.payload ?? []), ...(innerPayload ?? [])],
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
+}
+
 export function useUpdateOne<T = any, DTO = any>(
   resource: string,
   options?: { payload?: Partial<DTO>; meta?: Meta }
@@ -192,6 +279,31 @@ export function useUpdateOne<T = any, DTO = any>(
     if (!provider.updateOne) throw new NotImplementError('updateOne', resource);
 
     return await provider.updateOne(
+      {
+        ...options?.payload,
+        ...innerPayload,
+      },
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
+}
+
+export function useSyncUpdateOne<T = any, DTO = any>(
+  resource: string,
+  options?: { payload?: Partial<DTO>; meta?: Meta }
+) {
+  const provider = useSyncGetProvider(resource);
+
+  return (
+    innerPayload: Partial<DTO>,
+    meta?: Meta
+  ): Partial<T> | void => {
+    if (!provider.updateOne) throw new NotImplementError('updateOne', resource);
+
+    return provider.updateOne(
       {
         ...options?.payload,
         ...innerPayload,
@@ -227,6 +339,29 @@ export function useUpdateMany<T = any, DTO = T>(
   };
 }
 
+export function useSyncUpdateMany<T = any, DTO = T>(
+  resource: string,
+  options?: { payload?: Partial<DTO>[]; meta?: Meta }
+) {
+  const provider = useSyncGetProvider(resource);
+
+  return (
+    payload?: Partial<DTO>[],
+    meta?: Meta
+  ): Partial<T>[] | void => {
+    if (!provider.updateMany)
+      throw new NotImplementError('updateMany', resource);
+
+    return provider.updateMany(
+      [...(options?.payload ?? []), ...(payload ?? [])],
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
+}
+
 export function useDeleteOne<T = any>(
   resource: string,
   options?: { payload?: string | number; meta?: Meta }
@@ -246,6 +381,25 @@ export function useDeleteOne<T = any>(
   };
 }
 
+export function useSyncDeleteOne<T = any>(
+  resource: string,
+  options?: { payload?: string | number; meta?: Meta }
+) {
+  const provider = useSyncGetProvider(resource);
+
+  return (
+    payload?: string | number,
+    meta?: Meta
+  ): Partial<T> | void => {
+    if (!provider.deleteOne) throw new NotImplementError('deleteOne', resource);
+    const data = options?.payload ?? payload;
+
+    if (!data && data !== 0) throw new Error('id not provided');
+
+    return provider.deleteOne(data, { ...options?.meta, ...meta });
+  };
+}
+
 export function useDeleteMany<T = any>(
   resource: string,
   options?: { ids?: (string | number)[]; meta?: Meta }
@@ -260,6 +414,30 @@ export function useDeleteMany<T = any>(
       throw new NotImplementError('deleteMany', resource);
 
     return await provider.deleteMany(
+      [...(options?.ids ?? []), ...(ids ?? [])],
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
+}
+
+
+export function useSyncDeleteMany<T = any>(
+  resource: string,
+  options?: { ids?: (string | number)[]; meta?: Meta }
+) {
+  const provider = useSyncGetProvider(resource);
+
+  return (
+    ids?: (string | number)[],
+    meta?: Meta
+  ): Partial<T>[] | void => {
+    if (!provider.deleteMany)
+      throw new NotImplementError('deleteMany', resource);
+
+    return provider.deleteMany(
       [...(options?.ids ?? []), ...(ids ?? [])],
       {
         ...options?.meta,

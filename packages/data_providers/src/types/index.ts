@@ -12,6 +12,18 @@ export interface IDataProvider<ResponseDTO = any, SaveDTO = ResponseDTO>{
   updateMany?(payload: Partial<SaveDTO>[], meta?: Meta): Promise<ResponseDTO[] |void>;
 }
 
+export interface IDataSyncProvider<ResponseDTO = any, SaveDTO = ResponseDTO>{
+  getOne?(params:IGetOneParams, meta?: Meta ): ResponseDTO;
+  getList?(params: IGetListParams, meta?: Meta): ResponseDTO[];
+  getMany?(ids: (string | number)[], meta?: Meta): ResponseDTO[];
+  createOne?(payload: SaveDTO, meta?: Meta): Partial<ResponseDTO> | void;
+  createMany?(payload: SaveDTO[], meta?: Meta): Partial<ResponseDTO>[] | void;
+  deleteOne?(id: string | number, meta?: Meta): ResponseDTO | void;
+  deleteMany?(ids: (string | number)[], meta?: Meta): ResponseDTO[] | void;
+  updateOne?(payload: Partial<SaveDTO>, meta?: Meta): ResponseDTO |void;
+  updateMany?(payload: Partial<SaveDTO>[], meta?: Meta): ResponseDTO[] |void;
+}
+
 export interface IGetOneParams<FilterDTO = any>{
   id?: string | number;
   filter?: FilterDTO
