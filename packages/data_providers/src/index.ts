@@ -13,6 +13,7 @@ export {
   useSyncDeleteMany,
   useSyncDeleteOne,
   useSyncGetOne,
+  useSyncGetList,
   useSyncGetProvider,
   useSyncUpdateMany,
   useSyncUpdateOne

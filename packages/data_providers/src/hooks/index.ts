@@ -114,6 +114,28 @@ export function useGetList<T = any>(
   };
 }
 
+export function useSyncGetList<T = any>(
+  resource: string,
+  options?: { payload?: IGetListParams; meta?: Meta }
+) {
+  const provider = useSyncGetProvider(resource);
+
+  return (innerPayload?: IGetListParams, meta?: Meta): T[] => {
+    if (!provider.getList) throw new NotImplementError('getList', resource);
+
+    return provider.getList(
+      {
+        ...options?.payload,
+        ...innerPayload,
+      },
+      {
+        ...options?.meta,
+        ...meta,
+      }
+    );
+  };
+}
+
 /**
  * 
  *Exposes the createOne method of the provider for convenience
