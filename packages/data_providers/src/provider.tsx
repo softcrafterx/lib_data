@@ -7,9 +7,9 @@ interface DataProviderProps{
   syncProviders?: Record<string, IDataSyncProvider>;
 }
 
-export default function DataProvider({children, providers}:PropsWithChildren<DataProviderProps>){
+export default function DataProvider({children, ...rest}:PropsWithChildren<DataProviderProps>){
   return (
-    <dataContext.Provider value={providers}>
+    <dataContext.Provider value={rest}>
       {children}
     </dataContext.Provider>
   )
