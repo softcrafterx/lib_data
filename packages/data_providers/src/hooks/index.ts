@@ -1,5 +1,5 @@
 import { useContext, useMemo } from 'react';
-import { dataContext, dataSyncContext } from '../context';
+import { dataContext } from '../context';
 import { IDataProvider, IDataSyncProvider, IGetListParams, IGetOneParams, Meta } from '../types';
 
 class NotImplementError extends Error {
@@ -13,10 +13,14 @@ export function useGetProvider<T extends IDataProvider = IDataProvider>(
 ) {
   const context = useContext(dataContext);
 
-  if (!context)
-    throw new Error('No data providers created or context not provided');
+  
+  const provider = useMemo(() => {
+    if (!context.providers)
+      throw new Error('No data providers created or context not provided');
 
-  const provider = useMemo(() => context[resource], [resource]);
+    return context.providers[resource]
+  }, [resource]);
+
 
   if (!provider)
     throw new Error(`Provider with ${resource} name does not exist`);
@@ -27,12 +31,16 @@ export function useGetProvider<T extends IDataProvider = IDataProvider>(
 export function useSyncGetProvider<T extends IDataSyncProvider = IDataSyncProvider>(
   resource: string
 ) {
-  const context = useContext(dataSyncContext);
+  const context = useContext(dataContext);
 
-  if (!context)
-    throw new Error('No data providers created or context not provided');
+ 
 
-  const provider = useMemo(() => context[resource], [resource]);
+  const provider = useMemo(() => {
+    if (!context.syncProviders)
+      throw new Error('No data providers created or context not provided');
+
+    return context.syncProviders[resource]
+  }, [resource]);
 
   if (!provider)
     throw new Error(`Provider with ${resource} name does not exist`);

@@ -1,6 +1,14 @@
 import { createContext } from "react";
 import { IDataProvider, IDataSyncProvider } from "./types/index";
 
-export const dataContext = createContext<Record<string, IDataProvider> | undefined>(undefined)
+interface DataProviders{
+  providers?: Record<string, IDataProvider>;
+  syncProviders?: Record<string, IDataSyncProvider>
+}
 
-export const dataSyncContext = createContext<Record<string, IDataSyncProvider> | undefined>(undefined)
+export const dataContext = createContext<DataProviders>({
+  providers: undefined,
+  syncProviders: undefined
+})
+
+

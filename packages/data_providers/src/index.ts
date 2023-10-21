@@ -21,6 +21,4 @@ export {
 
 export { default as DataProvider } from './provider'
 
-export { default as DataSyncProvider } from './syncProvider'
-
 export { IDataProvider, IGetListParams, IGetOneParams, Meta, PaginationParams , IDataSyncProvider} from './types'

@@ -1,9 +1,10 @@
 import React, { PropsWithChildren } from "react";
 import {dataContext} from './context'
-import { IDataProvider } from "./types/index";
+import { IDataProvider, IDataSyncProvider } from "./types/index";
 
 interface DataProviderProps{
-  providers: Record<string, IDataProvider>
+  providers: Record<string, IDataProvider>;
+  syncProviders?: Record<string, IDataSyncProvider>;
 }
 
 export default function DataProvider({children, providers}:PropsWithChildren<DataProviderProps>){
